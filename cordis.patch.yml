@@ -1,0 +1,13 @@
+# Bundle patch for dsh-plugin-network-meter.
+#
+# The row this bundle inserts is named after the package, so the Loader
+# resolves it from the profile's node_modules. `config` holds the plugin's
+# own settings; the plugin's `Config` schema validates them at activation.
+- insert:
+    - id: network-meter
+      name: "dsh-plugin-network-meter"
+      config:
+        observe: true
+        maxHosts: 25
+        maxRecent: 60
+        refreshMs: 1000

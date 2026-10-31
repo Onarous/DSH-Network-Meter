@@ -1,0 +1,59 @@
+{
+  "name": "dsh-plugin-network-meter",
+  "version": "1.0.0",
+  "description": "Live network traffic accounting for DeepSeek Harness: measures every outbound HTTP request and response in the Host and shows sent/received totals in the right sidebar",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Onarous/DSH-Network-Meter.git"
+  },
+  "homepage": "https://github.com/Onarous/DSH-Network-Meter",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "network",
+    "traffic",
+    "bandwidth",
+    "monitor"
+  ],
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md"
+  ],
+  "engines": {
+    "dsh": ">=0.2.0-rc.1"
+  },
+  "scripts": {
+    "test": "node test/traffic.test.mjs && node test/end-to-end.mjs && node test/client.test.mjs && node test/loader-integration.mjs",
+    "build:index": "node tools/build-index.mjs"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "~3.18.5"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+# Keep plugin sources byte-identical across Windows and Linux checkouts:
+# a market index pins a commit, so the installed files must not change.
+* text=auto eol=lf
+*.svg text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.mjs text eol=lf
+*.js text eol=lf

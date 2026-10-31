@@ -1,0 +1,59 @@
+name: Publish plugin market index
+
+# Rebuilds market/index.json from the committed plugin sources and publishes it
+# to GitHub Pages, so the DSH plugin market always serves a valid index that
+# pins an exact commit.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The index pins the last commit that touched the plugin package, so
+          # the build needs the history, not just the tip.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rebuild the market index
+        run: node tools/build-index.mjs
+
+      - name: Fail when the rebuilt index differs
+        run: |
+          if ! git diff --quiet -- market/index.json; then
+            echo "::error::market/index.json is out of date. Run 'node tools/build-index.mjs' and commit the result."
+            git diff -- market/index.json
+            exit 1
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Network Meter",
+    "description": "Counts every outbound HTTP request the Host makes and shows the bytes sent and received in the right sidebar."
+  }
+}
