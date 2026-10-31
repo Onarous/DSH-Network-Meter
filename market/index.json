@@ -58,12 +58,12 @@
       },
       "versions": [
         {
-          "version": "1.0.0",
-          "publishTimestamp": 1793477253,
+          "version": "1.1.0",
+          "publishTimestamp": 1793482174,
           "source": {
             "type": "git",
             "url": "https://github.com/Onarous/DSH-Network-Meter",
-            "commit": "02f1d15d12edf417ed6df474b053581912711f6d"
+            "commit": "6ee0fd77cc81564540a57c9a80d8dc7409292087"
           },
           "engines": {
             "dsh": ">=0.2.0-rc.1"
