@@ -121,7 +121,11 @@ const SNAPSHOT = {
   recent: [{
     url: 'https://api.deepseek.com/v1/messages', method: 'POST', host: 'api.deepseek.com',
     scope: 'llm', status: 200, sentBytes: 1000, receivedBytes: 5000, durationMs: 812, error: null, at: 1
-  }]
+  }],
+  sentBytesPerSecond: 245760,
+  receivedBytesPerSecond: 15360,
+  activeRequests: 3,
+  windowMs: 5000
 };
 
 // The bundle's store is module-private, so the snapshot reaches it the way the
@@ -183,8 +187,15 @@ assert.match(loadingText, /Считаю трафик/, 'the body shows the loadi
 await new Promise((r) => setTimeout(r, 60));
 
 const populatedText = textOf(render(body.Component)).join(' ');
-assert.match(populatedText, /Отправлено/, 'the body shows the sent total');
-assert.match(populatedText, /Получено/, 'the body shows the received total');
+// The live rate leads the panel.
+assert.match(populatedText, /Сейчас/, 'the body leads with the live rate');
+assert.match(populatedText, /240 KB\/s/, 'the sent rate is formatted and shown');
+assert.match(populatedText, /15 KB\/s/, 'the received rate is formatted and shown');
+assert.match(populatedText, /3 запр\. активны/, 'the body reports the active requests');
+assert.match(populatedText, /окне 5 с/, 'the body reports the rate window');
+// The session totals stay as context.
+assert.match(populatedText, /Всего отправлено/, 'the body keeps the sent total');
+assert.match(populatedText, /Всего получено/, 'the body keeps the received total');
 assert.match(populatedText, /180 KB/, 'the sent total is formatted');
 assert.match(populatedText, /891 KB/, 'the received total is formatted');
 assert.match(populatedText, /По направлениям/, 'the body shows the per-scope breakdown');
@@ -195,14 +206,15 @@ assert.match(populatedText, /Последние запросы/, 'the body shows
 assert.match(populatedText, /42 запросов/, 'the request count is shown');
 assert.match(populatedText, /2 ошибок/, 'the error count is shown');
 
-// The tab chip title shows the live counters.
+// The tab chip title shows the live rate.
 const titleText = textOf(render(titleComponent)).join(' ');
-assert.match(titleText, /180 KB/, `the title shows the sent total, got: ${titleText}`);
-assert.match(titleText, /891 KB/, `the title shows the received total, got: ${titleText}`);
+assert.match(titleText, /240 KB\/s/, `the title shows the sent rate, got: ${titleText}`);
+assert.match(titleText, /15 KB\/s/, `the title shows the received rate, got: ${titleText}`);
 
-// The conversation-header indicator shows the same counters.
+// The conversation-header indicator shows the same live rate.
 const indicatorText = textOf(render(indicatorComponent)).join(' ');
-assert.match(indicatorText, /180 KB/, `the indicator shows the sent total, got: ${indicatorText}`);
+assert.match(indicatorText, /240 KB\/s/, `the indicator shows the sent rate, got: ${indicatorText}`);
+assert.match(indicatorText, /15 KB\/s/, `the indicator shows the received rate, got: ${indicatorText}`);
 
 globalThis.fetch = realFetch;
 

@@ -1,7 +1,7 @@
 {
   "name": "dsh-plugin-network-meter",
-  "version": "1.0.0",
-  "description": "Live network traffic accounting for DeepSeek Harness: measures every outbound HTTP request and response in the Host and shows sent/received totals in the right sidebar",
+  "version": "1.1.0",
+  "description": "Live network traffic accounting for DeepSeek Harness: measures every outbound HTTP request and response in the Host and shows the current transfer rate in the right sidebar",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -36,7 +36,7 @@
     "dsh": ">=0.2.0-rc.1"
   },
   "scripts": {
-    "test": "node test/traffic.test.mjs && node test/end-to-end.mjs && node test/client.test.mjs && node test/loader-integration.mjs",
+    "test": "node test/traffic.test.mjs && node test/rate-live.mjs && node test/end-to-end.mjs && node test/client.test.mjs && node test/loader-integration.mjs",
     "build:index": "node tools/build-index.mjs"
   },
   "dependencies": {

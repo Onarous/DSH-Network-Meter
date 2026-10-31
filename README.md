@@ -8,8 +8,8 @@ kind: "package-reference"
 English | [Русский](README.ru.md)
 
 Counts every outbound HTTP request the DSH Host makes and reports the bytes it
-sent and received. The totals appear in the right sidebar under **Сеть**, and a
-compact badge sits in the conversation header.
+sent and received. The panel leads with the **current transfer rate**, so you
+see what is moving right now; the session totals stay underneath as context.
 
 ![Network meter](icon.svg)
 
@@ -17,8 +17,19 @@ compact badge sits in the conversation header.
 
 A DeepSeek Harness session talks to a model provider, a web-search API, an MCP
 server and the plugin market. None of that traffic is visible from the
-interface. This plugin makes it visible: how many bytes went out, how many came
-back, to which hosts, and how fast.
+interface. This plugin makes it visible: how fast the bytes are moving now,
+how many went out, how many came back, to which hosts.
+
+## The rate, not the total
+
+A session total answers "how much so far", which grows forever and says
+nothing about the present. The headline is therefore a **rate over a sliding
+window** (five seconds by default): bytes per second, measured from the
+requests that finished inside that window.
+
+The window's own span is what the rate divides by, so a request that finished
+half a second ago counts as half a second of traffic, not five. When the
+traffic stops, the rate falls back to zero while the totals stay put.
 
 ## Install
 
@@ -110,6 +121,7 @@ The wrapper is transparent by construction:
 | `maxHosts` | `25` | How many hosts the snapshot reports. |
 | `maxRecent` | `60` | How many recent requests the ledger keeps. |
 | `refreshMs` | `1000` | How often the browser polls the Host, in milliseconds. |
+| `rateWindowMs` | `5000` | The sliding window the live rate is measured over, in milliseconds. A short window tracks the moment; a long one smooths the jitter of one answer. |
 
 ## Endpoints
 
@@ -122,6 +134,10 @@ Answers the current snapshot:
 ```json
 {
   "ok": true,
+  "sentBytesPerSecond": 245760,
+  "receivedBytesPerSecond": 15360,
+  "activeRequests": 3,
+  "windowMs": 5000,
   "sentBytes": 184320,
   "receivedBytes": 912233,
   "totalBytes": 1096553,
@@ -167,6 +183,7 @@ derived from the URL, not a transport fact; an unrecognised host lands in
 ```bash
 pnpm install
 node test/traffic.test.mjs         # byte counts, streams, errors, transport options
+node test/rate-live.mjs           # the live rate: a burst, a fall-off, a return to zero
 node test/end-to-end.mjs          # the Host half end to end
 node test/client.test.mjs         # the client bundle's slots and rendering
 ```

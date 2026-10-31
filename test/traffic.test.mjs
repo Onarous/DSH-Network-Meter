@@ -190,3 +190,66 @@ test('the ledger reports scopes, hosts and recent requests', async () => {
     await server.close();
   }
 });
+
+test('the live rate reflects the current window, not the session', async () => {
+  const server = await startServer();
+  const ledger = new TrafficLedger({ rateWindowMs: 1000 });
+  const owner = installTrafficObserver(ledger);
+  try {
+    // Nothing has happened yet: the rate is zero.
+    let rate = ledger.rate();
+    assert.equal(rate.sentBytesPerSecond, 0);
+    assert.equal(rate.receivedBytesPerSecond, 0);
+    assert.equal(rate.activeRequests, 0);
+
+    const payload = 'rate-probe-payload';
+    await fetch(`${server.base}/echo`, { method: 'POST', body: payload });
+    await until(() => ledger.requests === 1);
+
+    // The request is inside the window, so the rate is positive.
+    rate = ledger.rate();
+    assert.ok(rate.sentBytesPerSecond > 0, `the sent rate is positive, got ${rate.sentBytesPerSecond}`);
+    assert.ok(rate.receivedBytesPerSecond > 0, `the received rate is positive, got ${rate.receivedBytesPerSecond}`);
+    assert.equal(rate.activeRequests, 1);
+    assert.equal(rate.windowMs, 1000);
+
+    // The rate must be a rate, not the session total: a request of
+    // `payload` bytes cannot be reported as more bytes per second than
+    // the window allows.
+    assert.ok(
+      rate.sentBytesPerSecond <= Buffer.byteLength(payload) * 1000,
+      `the rate does not exceed the bytes sent inside one window, got ${rate.sentBytesPerSecond}`
+    );
+
+    // Once the window passes, the rate falls back to zero even though the
+    // session total stays.
+    await new Promise((r) => setTimeout(r, 1200));
+    rate = ledger.rate();
+    assert.equal(rate.sentBytesPerSecond, 0, 'the rate returns to zero after the window');
+    assert.equal(rate.receivedBytesPerSecond, 0, 'the received rate returns to zero after the window');
+    assert.equal(rate.activeRequests, 0);
+    assert.equal(ledger.sentBytes, Buffer.byteLength(payload), 'the session total is kept');
+  } finally {
+    owner.stop();
+    await server.close();
+  }
+});
+
+test('the snapshot carries the live rate alongside the totals', async () => {
+  const server = await startServer();
+  const { ledger, stop } = observe();
+  try {
+    await fetch(`${server.base}/echo`, { method: 'POST', body: 'snapshot-payload' });
+    await until(() => ledger.requests === 1);
+
+    const snapshot = ledger.snapshot();
+    assert.equal(typeof snapshot.sentBytesPerSecond, 'number');
+    assert.equal(typeof snapshot.receivedBytesPerSecond, 'number');
+    assert.equal(typeof snapshot.activeRequests, 'number');
+    assert.equal(snapshot.windowMs, 5000, 'the default window is five seconds');
+    assert.ok(snapshot.sentBytesPerSecond > 0);
+  } finally {
+    stop();
+    await server.close();
+  }
+});
