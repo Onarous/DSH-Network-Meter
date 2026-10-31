@@ -1,0 +1,75 @@
+{
+  "format": 1,
+  "title": {
+    "en": "Onarous DSH Plugins"
+  },
+  "description": {
+    "en": "Plugin bundles published by Onarous for the DeepSeek Harness plugin market."
+  },
+  "metadata": {
+    "categories": {
+      "productivity": {
+        "title": {
+          "en": "Productivity"
+        }
+      },
+      "developer": {
+        "title": {
+          "en": "Developer Tools"
+        }
+      }
+    },
+    "labels": {
+      "community": {
+        "title": {
+          "en": "Community"
+        }
+      }
+    },
+    "sortKeys": {}
+  },
+  "plugins": [
+    {
+      "name": "dsh-plugin-network-meter",
+      "title": {
+        "en": "Network Meter"
+      },
+      "description": {
+        "en": "Counts every outbound HTTP request the Host makes and shows the bytes sent and received in the right sidebar."
+      },
+      "author": "Onarous",
+      "homepage": "https://github.com/Onarous/DSH-Network-Meter",
+      "icon": "https://raw.githubusercontent.com/Onarous/DSH-Network-Meter/main/icon.svg",
+      "repository": {
+        "url": "https://github.com/Onarous/DSH-Network-Meter"
+      },
+      "metadata": {
+        "category": "developer",
+        "keywords": [
+          "network",
+          "traffic",
+          "bandwidth",
+          "monitor",
+          "bytes"
+        ],
+        "labels": [
+          "community"
+        ]
+      },
+      "versions": [
+        {
+          "version": "1.0.0",
+          "publishTimestamp": 1793477253,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/Onarous/DSH-Network-Meter",
+            "commit": "02f1d15d12edf417ed6df474b053581912711f6d"
+          },
+          "engines": {
+            "dsh": ">=0.2.0-rc.1"
+          }
+        }
+      ]
+    }
+  ]
+}
