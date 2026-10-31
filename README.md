@@ -49,6 +49,36 @@ the bundle to `dsh.profile.bundles`:
 
 Restart DSH after changing the bundle list.
 
+## Plugin market
+
+This plugin is published to the DeepSeek Harness plugin market. The index pins
+every version to an exact commit, so an installation is reproducible:
+
+```
+https://onarous.github.io/DSH-Network-Meter/market/index.json
+```
+
+The install spec it publishes is:
+
+```
+git+https://github.com/Onarous/DSH-Network-Meter.git#<commit>
+```
+
+To add the market to a profile, put the index URL in `cordis.patch.yml`:
+
+```yaml
+- id: plugin-market
+  name: "@deepseek-ai/dsh-plugin-market"
+  config:
+    indexes:
+      - https://onarous.github.io/DSH-Network-Meter/market/index.json
+```
+
+The index is rebuilt and republished by
+[`.github/workflows/publish-market-index.yml`](.github/workflows/publish-market-index.yml)
+on every push to `main`. The workflow fails if the committed index differs from
+a fresh rebuild, so the published document always matches the sources.
+
 ## How it works
 
 DSH exposes no injectable HTTP transport service — the Cordis service registry
